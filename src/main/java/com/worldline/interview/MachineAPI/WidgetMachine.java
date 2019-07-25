@@ -2,27 +2,27 @@ package com.worldline.interview.MachineAPI;
 
 import java.text.DecimalFormat;
 
+/**
+ * @author amirul.harfirie
+ * @ModifyDate 25-07-2018 21:25:00
+ *
+ */
 public class WidgetMachine {
-	
-//	public void param(FuelType requiredFuelType, int quantity) {
-//		produceWidgets(quantity, requiredFuelType);
-//	}
-	private static DecimalFormat df = new DecimalFormat("#.##");
-    private InternalCombustionEngine engine = new InternalCombustionEngine(FuelType.COAL);
-//    private SteamEngine engine2 = new SteamEngine(FuelType.WOOD);
 
-    public String produceWidgets(int quantity) {
-//		InternalCombustionEngine engine = new InternalCombustionEngine(requiredFuelType);
-    	engine.fill(FuelType.COAL, 100);
+	private static DecimalFormat df = new DecimalFormat(Constants.COST_FORMAT);
+//    private InternalCombustionEngine engine = new InternalCombustionEngine(FuelType.COAL);
+
+    public String produceWidgets(int quantity, String fuelType) {
+    	final FuelType fuel = FuelType.valueOf(fuelType);
+		InternalCombustionEngine engine = new InternalCombustionEngine(fuel);
+		
+    	engine.fill(fuel, 100); 
         engine.start();
-        
-//        engine2.fill(FuelType.DIESEL, 100);
-//        engine2.start();
         
         double cost = 0;
 
         if (engine.isRunning()) {
-            cost = produce(quantity);
+            cost = produce(quantity, engine);
         }
 
         engine.stop();
@@ -30,7 +30,7 @@ public class WidgetMachine {
         return df.format(cost);
     }
 
-    private double produce(int quantity) {
+    private double produce(int quantity, InternalCombustionEngine engine) {
         int batch = 0;
         int batchCount = 0;
         double costPerBatch = 0;
@@ -49,18 +49,17 @@ public class WidgetMachine {
         
         // assign the batch size
         if(engine.getFuelType() == FuelType.PETROL || engine.getFuelType() == FuelType.DIESEL) {
-        	batchSize = 8;
+        	batchSize = Constants.COMBUSTION_BATCH_SIZE;
         }
         else {
-        	batchSize = 2;
+        	batchSize = Constants.STEAM_BATCH_SIZE;
         }
         
         while (batch < quantity) {
             batch = batch + batchSize;
             batchCount++;
-//        	System.out.println("count: "+ batchCount);
         }
-//        System.out.println(batchCount + " x " + costPerBatch);
+        
         return batchCount * costPerBatch;
     }
 
